@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Điểm đến hot | VN</title>
+
+  <!-- TailwindCSS -->
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" sizes="16x16" href="/vietnam_flag.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            emerald: {
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="font-[Be_Vietnam_Pro] bg-gray-50 text-gray-900">
+
+  <!-- HEADER -->
+
+  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-lg text-emerald-700">VietWander</span>
+      </div>
+      <button onclick="history.back()" class="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 text-gray-600 hover:bg-gray-100 transition">
+        ← Quay lại
+      </button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+
+  <section class="relative">
+    <div class="absolute inset-0">
+      <img src="https://byvn.net/ovdC" class="w-full h-full object-cover" />
+      <div class="absolute inset-0 bg-emerald-900/70"></div>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4 py-24 text-center text-white">
+      <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Điểm đến hot</h1>
+      <p class="text-emerald-100 text-lg max-w-2xl mx-auto">
+        Những địa điểm được yêu thích nhất, lượt xem cao và đánh giá nổi bật từ cộng đồng du lịch VietWander
+      </p>
+    </div>
+  </section>
+
+  <!-- CONTENT -->
+
+  <main class="max-w-7xl mx-auto px-4 py-16">
+
+<!-- GRID -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+  <%hotDestinations.forEach(dest => { %>
+    <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition transform hover:-translate-y-1 cursor-pointer">
+      <div class="relative h-52">
+        <img src="<%= dest.imageUrl %>" alt="<%= dest.name %>" class="w-full h-full object-cover">
+        <div class="absolute top-3 right-3 bg-white/90 px-2 py-1 rounded-lg text-sm font-bold text-gray-800">
+          ⭐ <%= dest.rating %>
+        </div>
+      </div>
+      
+      <div class="p-5 flex flex-col h-full">
+        <h3 class="text-lg font-bold text-gray-900 mb-1"><%= dest.name %></h3>
+
+        <p class="text-sm text-gray-500 mb-2"><i class="fa-solid fa-location-dot" style="color: #FF004F; margin-right: 4px;"></i><%= dest.location %></p>
+        <p class="text-sm text-gray-600 line-clamp-2 mb-4" id="fa"><%= dest.shortDescription %></p>
+        <div 
+            class="flex flex-wrap gap-2 mt-2 feature-box"
+            data-features="<%= dest.features %>">
+        </div>
+
+            </div>
+        </div>
+    <% }) %>
+</div>
+
+<!-- BACK CTA -->
+<div class="mt-16 text-center">
+  <button onclick="history.back()" class="inline-flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-full hover:bg-emerald-700 transition shadow-md">
+    ← Quay về trang trước
+  </button>
+</div>
+
+  </main>
+
+  <script>
+      document.querySelectorAll('.feature-box').forEach(box => {
+        const features = box.dataset.features;
+        if (!features) return;
+
+        features.split(',').forEach(f => {
+          const span = document.createElement('span');
+          span.textContent = `${f.trim()}`;
+          span.className = 'text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded-md';
+          box.appendChild(span);
+        })
+      })
+  </script>
+
+  <!-- FOOTER -->
+
+  <footer class="bg-gray-900 text-gray-400 text-sm py-10 mt-20">
+    <div class="max-w-7xl mx-auto px-4 text-center">© 2025 VietWander · Discover Vietnam</div>
+  </footer>
+
+</body>
+</html>

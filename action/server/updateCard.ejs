@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Update card site</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ceviche+One&family=Happy+Monkey&family=Orbitron:wght@400..900&family=Quicksand:wght@300..700&family=Saira:ital,wght@0,100..900;1,100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" type="text/css" href="/updateDesCard.css"> <!-- Khi da dung viewEngine thi link css phai co / truoc -->
+  <link rel="icon" sizes="16x16" href="/update.ico" type="image/x-icon">
+
+  <!-- Can import 2 link nay de dung SweetAlert-->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net">
+
+  <script src="/function.js"></script> 
+</head>
+
+<body>
+    <div id="update_structure"> 
+        <div id="update_input_form">
+          <form id="editForm"> 
+            <fieldset id="container">
+              <legend>Update card</legend>
+              <input type="hidden" id="data" name="data" value="<%=JSON.stringify(editCard)%>"> <%# Hide user id to avoid error caused by client %>
+            
+              <label for="name">Destination</label><br>
+              <input type="text" id="destination" name="destination" maxlength="100" placeholder="Tên địa điểm..." class="input_bar" autocomplete="off" value="<%=editCard.name%>" spellcheck="false"><br><br>
+
+              <label for="location">Location</label><br>
+              <input type="text" id="location" name="location" maxlength="100" placeholder="Vị trí..." class="input_bar" autocomplete="off" value="<%=editCard.location%>" spellcheck="false"><br><br>
+
+              <label for="description">Description</label><br>
+              <textarea type="text" id="description" name="description" maxlength="100" placeholder="Mô tả..." class="input_bar" autocomplete="off" spellcheck="false"><%= editCard.shortDescription%></textarea><br><br>
+              <label for="link">Link</label><br>
+              <input type="url" id="link" name="link" maxlength="100" placeholder="Url ảnh" class="input_bar" autocomplete="off" value="<%=editCard.imageUrl%>" spellcheck="false"><br><br>
+
+              <label for="link">Features</label><br>
+              <input type="text" id="features" name="features" maxlength="100" placeholder="Đặc điểm" class="input_bar" autocomplete="off" value="<%=editCard.features%>" spellcheck="false"><br><br>
+
+              <div class="btn">
+                  <button id="ok_btn" type="submit" onclick="askUserWantSaveChange(okBtn());/* Khi click button thi phai xac nhan Save va sau do tien hanh Edit*/">Ok</button>
+                  <button id="no_btn" type="button" onclick="cancelBtn();/* Khi click button thi tra ve trang chu */">No</button> 
+              </div>
+            </fieldset>
+          </form>
+        </div>
+
+    <div id="nice_view">
+        <div class="fish">
+            <div class="koiCoil"></div><div class="koiCoil"></div><div class="koiCoil"></div><div class="koiCoil"></div>
+            <div class="koiCoil"></div><div class="koiCoil"></div><div class="koiCoil"></div><div class="koiCoil"></div>
+            <div class="koiCoil"></div><div class="koiCoil"></div><div class="koiCoil"></div><div class="koiCoil"></div>
+            <div class="koiCoil"></div><div class="koiCoil"></div><div class="koiCoil"></div>
+        </div>
+
+        <div class="fish">
+            <div class="koiCoil"></div><div class="koiCoil"></div><div class="koiCoil"></div><div class="koiCoil"></div>
+            <div class="koiCoil"></div><div class="koiCoil"></div><div class="koiCoil"></div><div class="koiCoil"></div>
+            <div class="koiCoil"></div><div class="koiCoil"></div><div class="koiCoil"></div><div class="koiCoil"></div>
+            <div class="koiCoil"></div><div class="koiCoil"></div><div class="koiCoil"></div>
+        </div>
+
+        <div class="seaLevel"></div>
+    </div>
+</div>
+
+    <script>
+        // Khong co preventDefault() submit bi chuyen huong --> khong hien SweetAlert
+        const preventRedirect = document.getElementById("editForm").addEventListener("submit", (e)=>{e.preventDefault();})
+
+        const cancelBtn = () => {
+            alertBox("error", "Cancelled", "Nothing changed");
+            setTimeout(()=>{window.location.href='/';}, 2000); // Set time de refresh page, khong thi auto refresh --> khong hien alertBox
+        }
+
+        // Empty --> True
+        const checkEmpty = (e) => {return !e || e.trim().length === 0;}
+
+        // Kiem tra neu Url khac empty va valid khong --> khac empty thi hien Error den khi nhap dung Format 
+        const link_target = document.getElementById("link");
+        link_target.addEventListener("mouseleave", () => {
+            if(!checkEmpty(link_target.value)){
+                if(!isValidUrlClient(link_target.value)){
+                    alertBox("error", "Invalid Url", "Wrong format");
+                }
+            }
+        })
+
+        const okBtn = () =>{
+            // Value cua input edit boi Client
+            // Note: prev_input_data dang la JSON nen dung JSON.parse ==> object 
+            const prev_input_data = JSON.parse(document.getElementById("data").value);
+
+            const input_destination = document.getElementById("destination").value;
+            const input_location = document.getElementById("location").value;
+            const input_description = document.getElementById("description").value;
+            const input_link = link_target.value;
+            const input_features = document.getElementById("features").value;
+
+            // Value cua input sau khi kiem tra
+            const dataUpdated = {
+                id: prev_input_data.id,
+                destination: (checkEmpty(input_destination))? prev_input_data.destination:input_destination,
+                location: (checkEmpty(input_location))? prev_input_data.location:input_location,
+                description: (checkEmpty(input_description))? prev_input_data.description:input_description,
+                link: (checkEmpty(input_link))? prev_input_data.link:input_link,
+                features: (checkEmpty(input_features))? prev_input_data.features:input_features
+            }
+
+            return dataUpdated;
+        }
+
+        document.body.classList.add('no-scroll'); // Scroll off
+        //document.body.classList.remove('no-scroll'); // Scroll on
+
+    </script>
+
+    </body>
+</html>

@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VietWander - Khám phá Việt Nam</title>
+    
+    <!-- External CSS Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/styles.css">
+    <link rel="icon" sizes="16x16" href="vietnam_flag.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+    <!-- React & Babel (Core Libraries) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Tailwind Config for Colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        emerald: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            900: '#064e3b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Note: them type="module" la cooked luon -->
+    <script src="function.js"></script> 
+
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.33.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.561.0",
+    "vite": "https://esm.sh/vite@^7.3.0",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
+  }
+}
+</script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- MAIN REACT APP SCRIPT -->
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- 1. DATA & CONSTANTS ---
+        const ViewState = {
+            HOME: 'HOME',
+            DETAIL: 'DETAIL',
+            LOGIN: 'LOGIN'
+        };
+
+
+        // --- 2. ICONS (SVG Components) ---
+        // Thay thế thư viện lucide-react bằng SVG trực tiếp để chạy không cần build
+        const Icons = {
+            MapPin: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>,
+            User: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+            Search: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
+            Menu: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>,
+            X: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>,
+            ArrowRight: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>,
+            Star: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+            Sparkles: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M9 3v4"/><path d="M3 5h4"/><path d="M3 9h4"/></svg>,
+            Send: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>,
+            Loader2: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>,
+            ArrowLeft: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>,
+            Clock: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+            Heart: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>,
+            Share2: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>,
+            Plus: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="M12 5v14"/></svg>,
+            Zap: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+            ChevronLeft: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m15 18-6-6 6-6"/></svg>,
+            ChevronRight: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6"/></svg>,
+            Upload: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>,
+        
+            Trash: ({ className }) => (
+                <svg xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                        <polyline points="3 6 5 6 21 6"/> <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                        <path d="M10 11v6"/> <path d="M14 11v6"/> <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                </svg>
+            ),
+            Edit: ({ className }) => (
+                <svg
+                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                    <path d="M12 20h9"/> <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>
+                </svg>
+            )
+        };
+
+        // --- 3. SERVICE HELPER (No Build) ---
+        // Sử dụng fetch API thay vì import SDK để chạy trực tiếp trên browser
+        const askGemini = async (destinationName, location, question, apiKey) => {
+            if (!apiKey) return "Vui lòng nhập API Key để sử dụng tính năng AI.";
+            
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+                const prompt = `Bạn là hướng dẫn viên du lịch. Địa điểm: ${destinationName} (${location}). Câu hỏi: ${question}. Trả lời ngắn gọn dưới 100 từ, vui vẻ.`;
+                
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }]
+                };
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                if (data.error) throw new Error(data.error.message);
+                
+                return data.candidates?.[0]?.content?.parts?.[0]?.text || "Không có phản hồi.";
+            } catch (error) {
+                console.error(error);
+                return "Lỗi kết nối AI: " + error.message;
+            }
+        };
+
+        // --- 4. COMPONENTS ---
+
+        const Navbar = ({ currentView, onChangeView }) => {
+            const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+            return (
+                <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm transition-all duration-300">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex justify-between h-16 items-center">
+                            <div className="flex-shrink-0 flex items-center cursor-pointer gap-2 group" onClick={() => onChangeView(ViewState.HOME)}>
+                                <div className="bg-emerald-500 p-1.5 rounded-lg group-hover:bg-emerald-600 transition-colors">
+                                    <Icons.MapPin className="h-6 w-6 text-white" />
+                                </div>
+                                <span className="font-bold text-xl text-emerald-900 tracking-tight">VietWander</span>
+                            </div>
+                            <div className="hidden md:flex space-x-8 items-center">
+                                <a href="/">
+                                    <button onClick={() => onChangeView(ViewState.HOME)} className={`${currentView === ViewState.HOME ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-500'} transition-colors`}>Trang chủ</button>
+                                </a>
+                                <a href="/api/des/hot"><button className="text-gray-600 hover:text-emerald-500 transition-colors">Điểm đến hot</button></a>
+                                
+                                <a href="/api/blog">
+                                    <button className="text-gray-600 hover:text-emerald-500 transition-colors">Blog</button> 
+                                </a>
+                                
+                                <div className="relative">
+                                    <Icons.Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                    <input type="text" placeholder="Tìm kiếm..." className="pl-9 pr-4 py-1.5 rounded-full bg-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 w-48 transition-all" />
+                                </div>
+                                <button className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-full hover:bg-emerald-700 transition-all shadow-md hover:shadow-lg active:scale-95">
+                                    <Icons.User className="h-4 w-4" />
+                                    <span>Đăng nhập</span>
+                                </button>
+                            </div>
+                            <div className="md:hidden flex items-center">
+                                <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-600 hover:text-gray-900 focus:outline-none">
+                                    {isMobileMenuOpen ? <Icons.X className="h-6 w-6" /> : <Icons.Menu className="h-6 w-6" />}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {isMobileMenuOpen && (
+                        <div className="md:hidden bg-white border-t border-gray-100 fade-in">
+                            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                                <button onClick={() => { onChangeView(ViewState.HOME); setIsMobileMenuOpen(false); }} className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-50">Trang chủ</button>
+                                <button className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-emerald-600 font-semibold hover:bg-emerald-50">Đăng nhập / Đăng ký</button>
+                            </div>
+                        </div>
+                    )}
+                </nav>
+            );
+        };
+
+        const Hero = ({ onExplore }) => (
+            <div className="relative bg-emerald-900 overflow-hidden">
+                <div className="absolute inset-0">
+                    <img className="w-full h-full object-cover opacity-40" src="https://byvn.net/TQ9K" alt="Vietnam Landscape"/>
+                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-900/90 to-emerald-900/50 mix-blend-multiply" />
+                </div>
+                <div className="relative max-w-7xl mx-auto py-24 px-4 sm:py-32 sm:px-6 lg:px-8 flex flex-col items-center text-center fade-in">
+                    <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl mb-6 shadow-sm">
+                        Khám phá vẻ đẹp <span className="text-emerald-300">Việt Nam</span>
+                    </h1>
+                    <p className="mt-6 text-xl text-emerald-100 max-w-3xl mx-auto">
+                        Chia sẻ trải nghiệm, đọc đánh giá chân thực và lên kế hoạch cho chuyến đi tiếp theo của bạn cùng cộng đồng yêu du lịch lớn nhất Việt Nam.
+                    </p>
+                    <div className="mt-10 max-w-sm mx-auto sm:max-w-none sm:flex sm:justify-center gap-4">
+                        <button onClick={onExplore} className="flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full text-emerald-900 bg-emerald-100 hover:bg-white md:py-4 md:text-lg md:px-10 transition-all transform hover:scale-105 shadow-lg">
+                            Khám phá ngay <Icons.ArrowRight className="ml-2 h-5 w-5" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const DestinationCard = ({ destination, onClick }) => (
+            <div className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 cursor-pointer flex flex-col h-full transform hover:-translate-y-1 fade-in" onClick={() => onClick(destination)}>
+                <div className="relative h-48 sm:h-56 overflow-hidden">
+
+                    <img src={destination.imageUrl} alt={destination.name} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
+                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
+                        <Icons.Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                        <span className="text-sm font-bold text-gray-800">{destination.rating}</span>
+                    </div>
+                </div>
+                <div className="p-5 flex flex-col flex-grow">
+                    <div className="flex items-start justify-between mb-2">
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-900 group-hover:text-emerald-600 transition-colors">{destination.name}</h3>
+                            <div className="flex items-center text-gray-500 text-sm mt-1">
+                                <Icons.MapPin className="h-3.5 w-3.5 mr-1" />
+                                {destination.location}
+                            </div>
+                        </div>
+                    </div>
+                    <p className="text-gray-600 text-sm line-clamp-2 mb-4 flex-grow">{destination.shortDescription}</p>
+                    <div className="flex flex-wrap gap-2 mt-auto">
+                        {destination.features.slice(0, 3).map((feature, idx) => (
+                            <span key={idx} className="bg-emerald-50 text-emerald-700 text-xs px-2.5 py-1 rounded-md font-medium">{feature}</span>
+                        ))}
+                    </div>
+                </div>
+                
+                
+                <a href={`/api/des/update/page/${destination.id}`} /* Note: The A can de khi nhap vao icon Edit thi link sang Update page*/> 
+                    <button // Button de thuc hien thao tac Edit
+
+                    /* Note: Thao tac Edit Card duoc handle khi nhan submit Ok form ben updateCard.ejs*/
+                        onClick={(e) => {
+                            e.stopPropagation();
+                        }}
+                        className="absolute top-3 left-3 p-2 rounded-lg bg-white/90 rounded-lg hover:bg-emerald-100">
+                        <Icons.Edit className="h-4 w-4 text-emerald-600" />
+                    </button>
+                </a>
+
+                <button // Button de thuc hien thao tac Delete
+                    onClick={(e) => {
+                        e.stopPropagation(); // Tranh xung dot khi click card --> giua view card va delete card 
+
+                        commitDeleteChangeAlert(destination.id); // Logic xoa card
+                    }}
+                    className="absolute top-12 left-3 p-2 bg-white/90 rounded-lg hover:bg-red-100">
+                    <Icons.Trash className="h-4 w-4 text-red-600" />
+                </button>
+            </div>
+        );
+
+        const AIAssistant = ({ destination }) => {
+            const [question, setQuestion] = useState('');
+            const [answer, setAnswer] = useState(null);
+            const [isLoading, setIsLoading] = useState(false);
+            const [apiKey, setApiKey] = useState('');
+
+            // Load API key from localStorage if available
+            useEffect(() => {
+                const savedKey = localStorage.getItem('gemini_api_key');
+                if (savedKey) setApiKey(savedKey);
+            }, []);
+
+            const handleAsk = async (e) => {
+                e.preventDefault();
+                if (!question.trim()) return;
+                
+                // Save key for later
+                if (apiKey) localStorage.setItem('gemini_api_key', apiKey);
+
+                setIsLoading(true);
+                setAnswer(null);
+                const response = await askGemini(destination.name, destination.location, question, apiKey);
+                setAnswer(response);
+                setIsLoading(false);
+            };
+
+            return (
+                <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-6 border border-indigo-100 shadow-sm mt-8">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="bg-white p-2 rounded-full shadow-sm"><Icons.Sparkles className="h-5 w-5 text-indigo-600" /></div>
+                        <h3 className="font-bold text-indigo-900 text-lg">Trợ lý du lịch AI</h3>
+                    </div>
+                    
+                    {!apiKey && (
+                        <div className="mb-4">
+                            <input type="password" placeholder="Nhập Gemini API Key của bạn..." className="w-full px-3 py-2 text-sm border rounded mb-2" value={apiKey} onChange={e => setApiKey(e.target.value)} />
+                            <p className="text-xs text-gray-500">Key được lưu trên trình duyệt của bạn.</p>
+                        </div>
+                    )}
+
+                    <p className="text-indigo-700/80 text-sm mb-4">Bạn có thắc mắc gì về <strong>{destination.name}</strong>?</p>
+                    {answer && (
+                        <div className="bg-white p-4 rounded-xl border border-indigo-100 shadow-sm mb-4 text-gray-700 text-sm leading-relaxed animate-pulse-once">
+                            <strong className="text-indigo-600 block mb-1">AI trả lời:</strong>{answer}
+                        </div>
+                    )}
+                    <form onSubmit={handleAsk} className="relative">
+                        <input type="text" value={question} onChange={(e) => setQuestion(e.target.value)} placeholder="Ví dụ: Ăn gì ngon? Mùa nào đẹp?" className="w-full pl-4 pr-12 py-3 rounded-xl border border-indigo-200 focus:border-indigo-500 outline-none bg-white shadow-sm" disabled={isLoading} />
+                        <button type="submit" disabled={isLoading || !question.trim()} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-300">
+                            {isLoading ? <Icons.Loader2 className="h-4 w-4 animate-spin" /> : <Icons.Send className="h-4 w-4" />}
+                        </button>
+                    </form>
+                </div>
+            );
+        };
+
+        const DetailView = ({ destination, onBack }) => (
+            <div className="fade-in min-h-screen bg-white">
+                <div className="relative h-64 md:h-96 w-full">
+                    <img src={destination.imageUrl} alt={destination.name} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                    <button onClick={onBack} className="absolute top-6 left-4 md:left-8 bg-white/20 hover:bg-white/40 backdrop-blur-md p-2 rounded-full text-white transition-all"><Icons.ArrowLeft className="h-6 w-6" /></button>
+                    <div className="absolute bottom-6 left-4 md:left-8 text-white">
+                        <h1 className="text-3xl md:text-5xl font-bold mb-2 shadow-sm">{destination.name}</h1>
+                        <div className="flex items-center gap-4 text-sm md:text-base font-medium">
+                            <span className="flex items-center gap-1"><Icons.MapPin className="h-4 w-4" /> {destination.location}</span>
+                            <span className="flex items-center gap-1"><Icons.Star className="h-4 w-4 text-yellow-400 fill-yellow-400" /> {destination.rating} / 5.0</span>
+                        </div>
+                    </div>
+                </div>
+                <div className="max-w-4xl mx-auto px-4 py-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div className="lg:col-span-2">
+                            <div className="flex gap-3 mb-8">
+                                <button className="flex-1 bg-emerald-600 text-white py-2.5 rounded-lg font-medium hover:bg-emerald-700 transition-colors shadow-sm active:scale-95">Viết đánh giá</button>
+                                <button className="px-4 py-2.5 border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600"><Icons.Heart className="h-5 w-5" /></button>
+                                <button className="px-4 py-2.5 border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600"><Icons.Share2 className="h-5 w-5" /></button>
+                            </div>
+                            <section className="mb-10">
+                                <h2 className="text-xl font-bold text-gray-900 mb-4">Giới thiệu</h2>
+                                <p className="text-gray-600 leading-relaxed text-lg">{destination.fullDescription}</p>
+                                <div className="mt-4 flex flex-wrap gap-2">{destination.features.map(f => <span key={f} className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">#{f}</span>)}</div>
+                            </section>
+                            <section className="mb-10">
+                                <h2 className="text-xl font-bold text-gray-900 mb-4">Hình ảnh</h2>
+                                <div className="grid grid-cols-3 gap-2">
+                                    {destination.gallery.length > 0 ? destination.gallery.map((img, idx) => <img key={idx} src={img} className="w-full h-24 md:h-32 object-cover rounded-lg hover:opacity-90 cursor-pointer" />) : <p className="text-gray-400 text-sm italic col-span-3">Chưa có thêm hình ảnh.</p>}
+                                </div>
+                            </section>
+                            <section>
+                                <h2 className="text-xl font-bold text-gray-900 mb-4">Đánh giá ({destination.reviews.length})</h2>
+                                <div className="space-y-4">
+                                    {destination.reviews.length > 0 ? destination.reviews.map(review => (
+                                        <div key={review.id} className="bg-gray-50 p-4 rounded-xl">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <div className="flex items-center gap-2">
+                                                    <img src={review.avatarUrl} className="w-8 h-8 rounded-full" />
+                                                    <span className="font-medium text-gray-900">{review.userName}</span>
+                                                </div>
+                                                <span className="text-xs text-gray-500">{review.date}</span>
+                                            </div>
+                                            <p className="text-gray-700 text-sm">{review.comment}</p>
+                                        </div>
+                                    )) : <div className="text-center py-8 bg-gray-50 rounded-xl border-dashed border border-gray-200"><p className="text-gray-500">Chưa có đánh giá nào.</p></div>}
+                                </div>
+                            </section>
+                        </div>
+                        <div className="lg:col-span-1">
+                            <div className="sticky top-24 space-y-6">
+                                <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+                                    <h3 className="font-bold text-gray-900 mb-4">Thông tin nhanh</h3>
+                                    <div className="space-y-3">
+                                        <div className="flex items-start gap-3"><Icons.Clock className="h-5 w-5 text-emerald-500" /><div><span className="block text-sm font-medium text-gray-700">Thời gian lý tưởng</span><span className="text-sm text-gray-500">Tháng 4 - Tháng 9</span></div></div>
+                                        <div className="flex items-start gap-3"><Icons.MapPin className="h-5 w-5 text-emerald-500" /><div><span className="block text-sm font-medium text-gray-700">Vị trí</span><span className="text-sm text-gray-500">{destination.location}</span></div></div>
+                                    </div>
+                                </div>
+                                <AIAssistant destination={destination} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const Pagination = ({ itemsPerPage, totalItems, paginate, currentPage }) => {
+            const pageNumbers = [];
+            for (let i = 1; i <= Math.ceil(totalItems / itemsPerPage); i++) pageNumbers.push(i);
+            if (pageNumbers.length <= 1) return null;
+
+            return (
+                <div className="flex justify-center items-center space-x-2 mt-12">
+                    <button onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1} className="p-2 rounded-lg border border-gray-300 text-gray-500 hover:bg-gray-50 disabled:opacity-50"><Icons.ChevronLeft className="h-5 w-5" /></button>
+                    {pageNumbers.map(number => (
+                        <button key={number} onClick={() => paginate(number)} className={`w-10 h-10 rounded-lg text-sm font-medium ${currentPage === number ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-700 hover:bg-gray-100 border border-gray-300'}`}>{number}</button>
+                    ))}
+                    <button onClick={() => paginate(currentPage + 1)} disabled={currentPage === pageNumbers.length} className="p-2 rounded-lg border border-gray-300 text-gray-500 hover:bg-gray-50 disabled:opacity-50"><Icons.ChevronRight className="h-5 w-5" /></button>
+                </div>
+            );
+        };
+
+        // --- Add new destination ---
+
+        const AddDestinationModal = ({ isOpen, onClose, onAdd }) => {
+            const [formData, setFormData] = useState({ name: '', location: '', shortDescription: '', imageUrl: '', features: '' });
+            if (!isOpen) return null;
+            
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+
+                // Thao tac tu dien vao cac o input add new destination khi Error
+                const newDest = {
+                    id: Date.now().toString(),
+                    ...formData,
+                    fullDescription: formData.shortDescription,
+                    imageUrl: formData.imageUrl || `https://picsum.photos/800/600?random=${Date.now()}`,
+                    rating: 5.0, gallery: [], reviews: [],
+                    features: formData.features.split(',').map(f => f.trim()).filter(f => f !== '')
+                };
+                onAdd(newDest);
+
+                onClose();
+                setFormData({ name: '', location: '', shortDescription: '', imageUrl: '', features: '' });
+            };
+
+            return (
+                <div className="fixed inset-0 z-[60] overflow-y-auto">
+                    <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                        <div className="fixed inset-0 bg-gray-900 bg-opacity-75" onClick={onClose}></div>
+                        <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full p-6">
+                            <div className="flex justify-between items-center mb-5"><h3 className="text-xl font-bold text-gray-900">Thêm địa điểm</h3><button onClick={onClose}><Icons.X className="h-6 w-6 text-gray-400" /></button></div>
+                            
+                            
+                            <form id='Add-new-destination' onSubmit={handleSubmit} className="space-y-4" action='/api/new-dest' method='POST'>
+
+                                <input spellcheck="false" required type="text" className="w-full px-3 py-2 border rounded-lg" placeholder="Tên địa điểm" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                                <input spellcheck="false" required type="text" className="w-full px-3 py-2 border rounded-lg" placeholder="Vị trí" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} />
+                                <textarea spellcheck="false" required rows={2} className="w-full px-3 py-2 border rounded-lg" placeholder="Mô tả..." value={formData.shortDescription} onChange={e => setFormData({...formData, shortDescription: e.target.value})} />
+                                <div className="flex gap-2"><input spellcheck="false" type="url" className="w-full px-3 py-2 border rounded-lg" placeholder="URL ảnh" value={formData.imageUrl} onChange={e => setFormData({...formData, imageUrl: e.target.value})} /><div className="w-10 flex items-center justify-center bg-gray-100 rounded-lg"><Icons.Upload className="h-4 w-4" /></div></div>
+                                <input spellcheck="false" type="text" className="w-full px-3 py-2 border rounded-lg" placeholder="Đặc điểm (cách nhau bởi dấu phẩy)" value={formData.features} onChange={e => setFormData({...formData, features: e.target.value})} />
+                               
+                                <div className="pt-4 flex gap-3"><button type="button" onClick={onClose} className="flex-1 px-4 py-2 border rounded-lg">Hủy</button>
+                                    <button onClick={()=>{  
+                                        // Thong bao da them moi Card thanh cong chua
+                  
+                                        showSuccessOrFail(formData);
+                                        setFormData({ name: '', location: '', shortDescription: '', imageUrl: '', features: '' });
+                                        onClose();
+                                }} type="submit" className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg">Thêm
+                                    </button></div>
+                            
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- 5. MAIN APP ---
+        const App = () => {
+            const [view, setView] = useState(ViewState.HOME);
+            const [selectedDestination, setSelectedDestination] = useState(null);
+
+            const [destinations, setDestinations] = useState([]);
+
+            const [currentPage, setCurrentPage] = useState(1);
+            const [isModalOpen, setIsModalOpen] = useState(false);
+            const itemsPerPage = 6;
+
+            const handleDestinationClick = (dest) => { setSelectedDestination(dest); setView(ViewState.DETAIL); window.scrollTo(0, 0); };
+            const handleBackToHome = () => { setSelectedDestination(null); setView(ViewState.HOME); };
+            const handleAddDestination = (newDest) => { setDestinations([newDest, ...destinations]); setCurrentPage(1); };
+            const paginate = (pageNumber) => { setCurrentPage(pageNumber); document.getElementById('destinations-grid')?.scrollIntoView({ behavior: 'smooth' }); };
+
+            const indexOfLastItem = currentPage * itemsPerPage;
+            const currentItems = destinations.slice(indexOfLastItem - itemsPerPage, indexOfLastItem);
+            
+            // Fetch data to render view
+            useEffect(() => {
+            fetch('/api/des')
+                .then(res => res.json())
+                .then(data => {
+                    console.log('FROM DB:', data);
+                    setDestinations(Array.isArray(data) ? data : []);
+                })
+                .catch(err => {
+                    console.error(err);
+                    setDestinations([]);
+                });
+            }, []);
+
+            return (
+                <div className="min-h-screen flex flex-col font-sans text-gray-900">
+                    {view !== ViewState.DETAIL && <Navbar currentView={view} onChangeView={setView} />}
+                    
+                    {view === ViewState.HOME && (
+                        <main className="flex-grow fade-in">
+                            <Hero onExplore={() => document.getElementById('destinations-grid')?.scrollIntoView({ behavior: 'smooth' })} />
+                            <div id="destinations-grid" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                                <div className="flex items-center justify-between mb-8">
+                                    <h2 className="text-3xl font-bold text-gray-700 tracking-tight">Điểm đến nổi bật</h2>
+                                    <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-emerald-700 transition-colors shadow-sm"><Icons.Plus className="h-4 w-4" /> Thêm địa điểm</button>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                                    {currentItems.map((dest) => <DestinationCard key={dest.id} destination={dest} onClick={handleDestinationClick} />)}
+                                </div>
+                                <Pagination itemsPerPage={itemsPerPage} totalItems={destinations.length} paginate={paginate} currentPage={currentPage} />
+                            </div>
+                        </main>
+                    )}
+
+                    {view === ViewState.DETAIL && selectedDestination && <DetailView destination={selectedDestination} onBack={handleBackToHome} />}
+                    <AddDestinationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAdd={handleAddDestination} />
+                    
+                    <footer className="bg-gray-900 text-gray-300 py-12 border-t border-gray-800">
+                        <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-500">&copy; 2025 VietWander. All rights reserved.</div>
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+
+
+</body>
+</html>

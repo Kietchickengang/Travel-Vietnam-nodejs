@@ -1,0 +1,403 @@
+/*Giao dien ben trai*/
+legend {
+    font-family: "Orbitron";
+    font-size: 20px;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+label {
+    font-size: 17px;
+    letter-spacing: 0.5px;
+    opacity: 0.85;
+}
+
+body{
+    font-family: "Happy Monkey", cursive;
+    font-size: 20px;
+    font-style: none;
+    color: white;
+    letter-spacing: 1;
+    background: black;
+    letter-spacing: 1;
+}
+
+.input_bar{
+    margin-top: 7px;
+    border-radius: 8px;
+    border: none;
+    padding: 10px 10px;
+    display: inline-block;
+    width: 500px;
+    height: 20px;
+    background: rgba(255,255,255,0.15);
+    color: white;
+}
+
+.input_bar:focus {
+    background: rgba(255,255,255,0.25);
+    border-color: #00d4ff;
+    box-shadow: 0 0 0 3px rgba(0,212,255,0.25);
+}
+
+.input_bar:hover {
+    background: rgba(255,255,255,0.18);
+    border-color: #00e5ff;
+    box-shadow:
+        0 0 0 2px rgba(0,229,255,0.15),
+        0 8px 20px rgba(0,229,255,0.25);
+}
+
+#destination{
+    font-size: 16px;
+    font-family: 'Quicksand';
+    font-weight: 380;
+}
+
+#description{
+    height: 70px;
+    resize: none;
+    font-size: 17px;
+    font-family: 'Quicksand';
+    font-weight: 380;
+}
+
+#container{
+    width: 45%;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-radius: 8px;
+}
+
+#update_input_form{
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    line-height: 19px;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+}
+
+input::placeholder {
+    color: #999;
+    font-style: italic;
+    font-size: 16px;
+    font-family: "Happy Monkey";
+}
+
+textarea::placeholder {
+    color: #999;
+    font-style: italic;
+    font-size: 15px;
+    font-family: "Happy Monkey";
+}
+
+input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    font-size: 15px;
+    font-family: "Happy Monkey";
+}
+
+textarea:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    font-size: 15px;
+    font-family: "Happy Monkey";
+}
+
+input[type="text"]{
+    font-size: 15px;
+    font-family: "Happy Monkey";
+}
+
+input[type="url"]{
+    font-size: 15px;
+    font-family: "Happy Monkey";
+}
+
+input[type="url"]:user-invalid {
+    border: 2px solid red;
+}
+
+
+textarea[type="text"]{
+    font-size: 15px;
+    font-family: "Happy Monkey";
+}
+
+#no_btn{
+  cursor: pointer;
+  font-size: large;
+  font-family: inherit;
+  font-weight: bold;
+  color: #0011ff;
+  background-color: #f8f8fd;
+  padding: 0.2em 1.5em;
+  border-radius: 50em;
+  border: 6px solid #8b93f8;
+  box-shadow: 0px 3px #1f35ff;
+}
+#no_btn:active {
+  position: relative;
+  top: 8px;
+  border: 6px solid #646fff;
+  box-shadow: 0px 0px;
+}
+
+#ok_btn{
+    cursor: pointer;
+    font-size: large;
+    font-family: inherit;
+    font-weight: bold;
+    color: #ffaf02;
+    background-color: #ffffe3;
+    padding: 0.2em 1.5em;
+    border-radius: 50em;
+    border: 6px solid rgb(247, 169, 133);
+    box-shadow: 0px 3px #f32b11;
+}
+
+#ok_btn:active {
+    position: relative;
+    top: 8px;
+    border: 6px solid #ffb764;
+    box-shadow: 0px 0px;
+}
+
+#ok_btn, #no_btn {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+#ok_btn:hover, #no_btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn{
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+
+/* Giao dien ben phai*/
+
+:root {
+  --coilSize: 14px;
+  --delayCount: 40ms;
+  --scaleMe: 1;
+  --scaleFlip: 1;
+  --posFlip: 0;
+}
+
+.seaLevel {
+  font-family: "Open Sans", sans-serif;
+  background-color: lightblue;
+  overflow: hidden;
+}
+.fish {
+  position: absolute;
+  top: -35%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(
+    calc(var(--coilSize) * 4) calc(var(--coilSize) / 3) 5px rgba(0, 0, 0, 0.3)
+  );
+}
+.fish .koiCoil {
+  position: absolute;
+  width: var(--coilSize);
+  height: var(--coilSize);
+  background-color: orangered;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  margin-left: calc(var(--coilSize) / -2);
+  margin-top: calc(var(--coilSize) / -2);
+  transform: scale(var(--scaleMe), var(--scaleMe));
+  filter: contrast(200%);
+  offset-path: path(
+    "M11.7692 229.5C14.552 200.052 7.51901 171.858 -42.8757 170.644C-105.869 169.128 -131.294 76.612 -101.695 51.5872C-72.0955 26.5625 -24.6607 -50.7867 70.5883 51.5872C165.837 153.961 27.7073 131.211 33.0199 183.157C38.3326 235.102 90.3211 195.669 139.274 223.727C188.226 251.785 207.959 299.56 139.274 316.243C70.5883 332.926 41.3685 398.9 81.9726 419.754C122.577 440.608 222 478.524 222 419.754C222 372.738 222 242.432 222 183.157C219.091 129.948 175.78 30.8091 25.8099 59.9288C-161.652 96.3284 -30.3529 119.837 25.8099 141.07C81.9726 162.303 171.529 204.769 126.751 260.506C81.9726 316.243 101.326 362.501 139.274 373.496C177.222 384.492 170.012 464.495 70.5883 462.979C-28.835 461.462 -42.8757 393.015 -42.8757 373.496C-42.8757 238.288 11.7692 293 11.7692 240.506C11.7692 208.05 11.7692 237.336 11.7692 229.5Z"
+  );
+  animation: fishAnim 20000ms linear infinite;
+  box-shadow: calc(var(--coilSize) / -2) calc(var(--coilSize) / -10) 0 white
+    inset;
+}
+
+.fish:nth-of-type(2) {
+  transform-origin: top center;
+  transform: scale(-1, 1);
+  filter: drop-shadow(
+    calc(var(--coilSize) * -4) calc(var(--coilSize) / 3) 5px rgba(0, 0, 0, 0.3)
+  );
+}
+.fish:nth-of-type(2) .koiCoil {
+  background-color: white;
+  box-shadow: calc(var(--coilSize) / -2) calc(var(--coilSize) / -10) 0 orangered
+    inset;
+}
+.fish .koiCoil:nth-of-type(15),
+.fish .koiCoil:nth-of-type(14) {
+  background-color: orangered;
+}
+.fish:nth-of-type(2) .koiCoil:nth-of-type(15),
+.fish:nth-of-type(2) .koiCoil:nth-of-type(14) {
+  background-color: white;
+}
+.fish .koiCoil:nth-of-type(15)::after {
+  content: ":";
+  position: absolute;
+  color: black;
+  font-weight: 800;
+  text-align: center;
+  line-height: 60%;
+  font-size: calc(var(--coilSize) * 1.2);
+}
+.fish .koiCoil:nth-of-type(1)::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 50%;
+  top: 25%;
+  left: -100%;
+  border-radius: var(--coilSize);
+  background-color: white;
+  /*box-shadow: calc(var(--coilSize) / -10) calc(var(--coilSize) / -4) calc(var(--coilSize) / 3) rgba(0,0,0,.3) inset;*/
+  transform-origin: center right;
+  animation: backFlip 200ms ease-in-out alternate infinite;
+}
+.fish .koiCoil:nth-of-type(14) {
+  --scaleMe: 1.2;
+  animation-delay: calc(var(--delayCount) * 1);
+}
+.fish .koiCoil:nth-of-type(13) {
+  --scaleMe: 1.35;
+  animation-delay: calc(var(--delayCount) * 2);
+}
+.fish .koiCoil:nth-of-type(12) {
+  --scaleMe: 1.55;
+  animation-delay: calc(var(--delayCount) * 3);
+}
+.fish .koiCoil:nth-of-type(11) {
+  --scaleMe: 1.75;
+  animation-delay: calc(var(--delayCount) * 4);
+}
+.fish .koiCoil:nth-of-type(10) {
+  --scaleMe: 1.9;
+  animation-delay: calc(var(--delayCount) * 5);
+}
+.fish .koiCoil:nth-of-type(9) {
+  --scaleMe: 2;
+  animation-delay: calc(var(--delayCount) * 6);
+}
+.fish .koiCoil:nth-of-type(8) {
+  --scaleMe: 2;
+  animation-delay: calc(var(--delayCount) * 7);
+}
+.fish .koiCoil:nth-of-type(7) {
+  --scaleMe: 2;
+  animation-delay: calc(var(--delayCount) * 8);
+}
+.fish .koiCoil:nth-of-type(6) {
+  --scaleMe: 1.9;
+  animation-delay: calc(var(--delayCount) * 9);
+}
+.fish .koiCoil:nth-of-type(5) {
+  --scaleMe: 1.75;
+  animation-delay: calc(var(--delayCount) * 10);
+}
+.fish .koiCoil:nth-of-type(4) {
+  --scaleMe: 1.55;
+  animation-delay: calc(var(--delayCount) * 11);
+}
+.fish .koiCoil:nth-of-type(3) {
+  --scaleMe: 1.35;
+  animation-delay: calc(var(--delayCount) * 12);
+}
+.fish .koiCoil:nth-of-type(2) {
+  --scaleMe: 1.2;
+  animation-delay: calc(var(--delayCount) * 13);
+}
+.fish .koiCoil:nth-of-type(1) {
+  animation-delay: calc(var(--delayCount) * 14);
+}
+.fish .koiCoil:nth-of-type(12)::before,
+.fish .koiCoil:nth-of-type(12)::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 20%;
+  top: -10%;
+  left: -100%;
+  border-radius: var(--coilSize);
+  background-color: white;
+  transform-origin: center right;
+  animation: sideFlip 500ms ease-in-out alternate infinite;
+}
+.fish .koiCoil:nth-of-type(12)::after {
+  --scaleFlip: -1;
+  --posFlip: calc(var(--coilSize) * -1);
+}
+.seaLevel {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  opacity: 0.4;
+}
+@keyframes fishAnim {
+  0% {
+    offset-distance: 0%;
+  }
+  100% {
+    offset-distance: 100%;
+  }
+}
+@keyframes backFlip {
+  0% {
+    transform: rotate(45deg);
+  }
+  100% {
+    transform: rotate(-45deg);
+  }
+}
+@keyframes sideFlip {
+  0% {
+    transform: scale(1, var(--scaleFlip)) translateY(var(--posFlip))rotate(80deg);
+  }
+  100% {
+    transform: scale(1, var(--scaleFlip)) translateY(var(--posFlip))rotate(20deg);
+  }
+}
+
+
+/* Controller 2 ben the*/
+#update_structure{
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    flex-direction: row;
+    justify-content: center;
+}
+
+#nice_view {
+    width: 30%;
+    position: relative;
+    overflow: hidden;
+    background-color: #b3e5fc;
+    border-left: 2px solid rgba(255,255,255,0.3);
+    height: 84%;
+    border-radius: 8px;
+    margin-top: 60px;
+    margin-bottom: 60px;
+}
+
+/* Khong cho scroll*/
+
+.no-scroll {
+    overflow: hidden;
+    height: 100%;
+}
